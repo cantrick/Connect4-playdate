@@ -138,7 +138,18 @@ function love.keypressed(key)
             end
         end
     elseif gamestate.getCurrentState() == 'menu' then
-        if key == 'up' and cursor.y > 130 then
+        if key == 'down' and cursor.y == 180 then
+            cursor.x = cursor.x + 177
+            cursor.y = cursor.y + 10
+            cursor.quit = true
+            cursor.rematch = false
+            cursor.menu = false
+        elseif key == 'up' and cursor.y == 190 then
+            cursor.y = 180
+            cursor.x = cursor.x - 177
+            cursor.quit = false
+            cursor.menu = true
+        elseif key == 'up' and cursor.y > 130 then
             cursor.y = cursor.y - 50 
             cursor.rematch = true
             cursor.menu = false
@@ -157,6 +168,8 @@ function love.keypressed(key)
                 gamestate.setState('game', true)
                 gamestate.setState('menu', false)
                 cursor.reset()
+            elseif cursor.quit == true then
+                love.event.quit()
             end
         end
     elseif gamestate.getCurrentState() == 'gameOver' then
