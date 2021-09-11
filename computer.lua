@@ -7,10 +7,12 @@ computer.x = 40
 computer.y = 1
 computer.xBounds = {72,(32*7)+72}
 computer.xPad = 32
+computer.newY = 0
 computer.image = gfx.newImage('images/p2disc.png')
 computer.allDiscs = {}
 computer.currDiscCreated = false
 computer.turn = false
+computer.inAnim = false
 
 currDisc = {}
 
@@ -30,21 +32,27 @@ function computer.drawAllDiscs(disc)
 end
 
 function computer.update(dt)
-    if board.turn == 2 then
-        computer.turn = true
-    end
+    if computer.inAnim == true then
+        computer.updateAnimation(dt)
+        print('anim')
+    else 
+        if board.turn == 2 then
+            computer.turn = true
+        end
 
-    if computer.turn == false then
-        computer.turn = true
-    end
-    if computer.currDiscCreated == false then
-        currDisc = computer.newDisc(computer.x, computer.y)
-        table.insert(computer.allDiscs, currDisc)
-        computer.currDiscCreated = true
-    end
+        if computer.turn == false then
+            computer.turn = true
+        end
 
-    if currDisc.isPlaced ~= true then
-        computer.takeTurn()
+        if computer.currDiscCreated == false then
+            currDisc = computer.newDisc(computer.x, computer.y)
+            table.insert(computer.allDiscs, currDisc)
+            computer.currDiscCreated = true
+        end
+
+        if currDisc.isPlaced ~= true then
+            computer.takeTurn()
+        end
     end
 end
 
@@ -58,13 +66,37 @@ function computer.newDisc(pX, pY)
 end
 
 function computer.placeDisc(disc)
-    disc.y = disc.gridPos[1] * 32 + 1
+    computer.newY = disc.gridPos[1] * 32 + 1
+    computer.currDisc = disc
+    computer.inAnim = true
+    computer.updateAnimation(dt)
 end
 
 function computer.reset()
     computer.allDiscs = {}
     computer.currDiscCreated = false
 end
+
+function computer.updateAnimation(dt)
+    print('we in')
+    if computer.newY ~= 0 and computer.currDisc.y ~= computer.newY then
+        computer.currDisc.y = computer.currDisc.y + fallSpeed
+        fallSpeed = fallSpeed + 1.1
+        print('curr: ' .. computer.currDisc.y)
+        print('new: ' .. computer.newY)
+        if computer.currDisc.y > computer.newY then
+            computer.currDisc.y = computer.newY
+        end
+    end
+
+    if computer.newY ~= 0 and computer.currDisc.y == computer.newY then
+        print('2')
+        fallSpeed = 0
+        computer.inAnim = false
+        computer.newY = 0
+    end
+end
+
 
 function computer.takeTurn()
     if gamestate.getCurrentState() == 'game' then
@@ -105,6 +137,5 @@ function computer.takeTurn()
         end
     end
 end
-
 
 return computer
